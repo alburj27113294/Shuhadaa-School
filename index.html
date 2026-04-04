@@ -208,7 +208,7 @@
         }
 
         // تحديد اليوم الحالي تلقائياً
-        const daysArr = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
+        const daysArr = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس"];
         const today = daysArr[new Date().getDay()];
         if (["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس"].includes(today)) {
             document.getElementById('daySelect').value = today;
