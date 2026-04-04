@@ -3,238 +3,325 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة عرض الجدول المدرسي</title>
+    <title>منصة التعلم عن بعد الشاملة</title>
+
     <style>
         :root {
-            --primary: #4e73df;
-            --secondary: #858796;
-            --light: #f8f9fc;
-            --dark: #5a5c69;
+            --primary: #2563eb;
+            --success: #10b981;
+            --danger: #ef4444;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, sans-serif;
-            background-color: #f0f2f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
             margin: 0;
             padding: 20px;
         }
 
-        .container {
-            max-width: 1100px;
-            margin: auto;
-            background: white;
+        .container { max-width: 600px; margin: 0 auto; }
+
+        .auth-card {
+            background: var(--card);
             padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .filter-section {
+            background: var(--card);
+            padding: 20px;
             border-radius: 15px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            border: 1px solid #e2e8f0;
         }
 
-        .header {
-            text-align: center;
-            border-bottom: 2px solid var(--light);
-            margin-bottom: 25px;
-            padding-bottom: 10px;
-        }
-
-        /* تنسيق القوائم المنسدلة */
-        .controls {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            margin-bottom: 30px;
-            background: var(--light);
-            padding: 20px;
-            border-radius: 10px;
-        }
-
-        .control-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        select {
-            padding: 10px 20px;
-            font-size: 16px;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-            cursor: pointer;
-            background-color: white;
-        }
-
-        /* تنسيق الجدول */
-        .table-container {
-            overflow-x: auto;
-        }
-
-        table {
+        select, input[type="password"] {
             width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-            text-align: center;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            font-size: 1rem;
         }
 
-        th {
-            background-color: var(--primary);
-            color: white;
-            padding: 15px;
-            font-size: 16px;
-        }
-
-        td {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-            color: var(--dark);
-        }
-
-        tr:hover {
-            background-color: #f1f4ff;
-        }
-
-        .btn-link {
-            padding: 8px 15px;
-            background-color: #1cc88a;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            font-size: 14px;
-            font-weight: bold;
-        }
-
-        .btn-link:hover {
-            background-color: #17a673;
-        }
-
-        .status-msg {
-            text-align: center;
+        .lesson-card {
+            background: var(--card);
+            border-radius: 18px;
             padding: 20px;
-            color: var(--secondary);
-            font-style: italic;
+            margin-bottom: 15px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            transition: 0.3s ease;
+        }
+
+        .active-lesson {
+            border: 2px solid var(--success);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.15);
+            background: #f0fdf4;
+        }
+
+        .progress-container {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 5px;
+            background: #f1f5f9;
+        }
+
+        .progress-bar {
+            height: 100%; background: var(--success); width: 0%;
+            transition: width 1s linear;
+        }
+
+        .btn {
+            display: block; width: 100%; padding: 14px;
+            border-radius: 12px; border: none; font-weight: bold;
+            cursor: pointer; text-decoration: none; text-align: center;
+            margin-top: 10px; font-size: 1rem;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-outline { border: 1px solid var(--primary); color: var(--primary); background: none; }
+
+        .attendance-log {
+            background: #fff; border-radius: 15px; padding: 15px;
+            margin-top: 20px; border: 1px dashed #cbd5e1;
+            max-height: 400px; overflow-y: auto;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="header">
-        <h1>🗓️ نظام عرض الجداول المدرسية</h1>
+    <div id="loginScreen" class="auth-card">
+        <h2>👋 مرحباً بك</h2>
+        <p>أدخل الرمز للدخول </p>
+        <input type="password" id="passCode" placeholder="الرمز السري">
+        <button class="btn btn-primary" onclick="handleLogin()">دخول النظام</button>
     </div>
 
-    <div class="controls">
-        <div class="control-group">
-            <label>اختر الصف:</label>
-            <select id="gradeSelect" onchange="updateTable()">
-                <option value="الكل">جميع الصفوف</option>
-                <option value="الأول">الأول</option>
-                <option value="الثاني">الثاني</option>
-                <option value="الثالث">الثالث</option>
-                <option value="الرابع">الرابع</option>
-
-            </select>
+    <div id="mainApp" style="display:none;">
+        <div style="display:flex; justify-content: space-between; align-items: center;">
+            <h2 id="appTitle">جاري تحميل البيانات...</h2>
+            <button onclick="logout()" style="color:var(--danger); border:none; background:none; cursor:pointer;">خروج</button>
         </div>
-        <div class="control-group">
-            <label>اختر اليوم:</label>
-            <select id="daySelect" onchange="updateTable()">
+
+        <div class="filter-section">
+            <label>📅 اختر اليوم:</label>
+            <select id="daySelect" onchange="updateUI()">
                 <option value="الأحد">الأحد</option>
                 <option value="الاثنين">الاثنين</option>
                 <option value="الثلاثاء">الثلاثاء</option>
                 <option value="الأربعاء">الأربعاء</option>
                 <option value="الخميس">الخميس</option>
             </select>
-        </div>
-    </div>
 
-    <div class="table-container">
-        <table id="scheduleTable">
-            <thead>
-                <tr>
-                    <th>المادة</th>
-                    <th>المعلم</th>
-                    <th>الصف</th>
-                    <th>بداية الحصة</th>
-                    <th>نهاية الحصة</th>
-                    <th>الرابط</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody">
-                </tbody>
-        </table>
-        <div id="noData" class="status-msg" style="display:none;">لا توجد حصص مجدولة لهذه الاختيارات.</div>
+            <label>🎓 اختر الصف:</label>
+            <select id="gradeSelect" onchange="updateUI()">
+                <option value="1">الأول</option>
+                <option value="2">الثاني</option>
+                <option value="3">الثالث</option>
+                <option value="4">الرابع</option>
+                <option value="5">الخامس</option>
+                <option value="6">السادس</option>
+                <option value="7">السابع</option>
+                <option value="8">الثامن</option>
+                <option value="9">التاسع</option>
+
+            </select>
+        </div>
+
+        <div id="lessonsGrid"></div>
+
+        <div id="teacherPanel" style="display:none; margin-top: 30px;">
+            <hr>
+            <h3>📊 سجل الحضور الذكي</h3>
+            <button class="btn btn-outline" onclick="showAttendance()">تحديث وعرض سجل الحضور</button>
+            <div id="attendanceDisplay" class="attendance-log" style="display:none;"></div>
+        </div>
     </div>
 </div>
 
 <script>
-    // 1. ضع رابط الـ CSV المباشر هنا
-    const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTGKjAKsWsAxQhBhgf5-8gN9Z5sjeOiYwJgb2Ig3hfNOuLgBpjvovL_MuaO1OSqxgcMFDOL-7H4ljSZ/pub?gid=0&single=true&output=csv';
+   
+    const sheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ8Yk6Sq2bCZtlrH-mgqDZFYnRc54MYf8vAW6VIpW1WHIzKi5lkoBRTXjv5i8sXBkHMrbR_KHS-kMoV/pub?gid=0&single=true&output=csv';
+    
+    let rawData = []; // سيتم ملؤه من Google Sheets
 
-    let schoolData = [];
-
-    // جلب البيانات من Google Sheet
-    async function loadSheetData() {
+    async function fetchSheetData() {
         try {
-            const response = await fetch(SHEET_URL);
+            const response = await fetch(sheetURL);
             const data = await response.text();
-            
-            // تحويل النص إلى مصفوفة (مع مراعاة الفواصل)
-            const rows = data.split('\n').slice(1); // تجاوز السطر الأول (العناوين)
-            schoolData = rows.map(row => {
-                const columns = row.split(',');
-                return {
-                    teacher: columns[0]?.trim(),
-                    subject: columns[1]?.trim(),
-                    grade: columns[2]?.trim(),
-                    day: columns[3]?.trim(),
-                    start: columns[4]?.trim(),
-                    end: columns[5]?.trim(),
-                    link: columns[6]?.trim()
-                };
-            });
-            updateTable(); // عرض البيانات لأول مرة
+            parseCSV(data);
         } catch (error) {
-            console.error("خطأ في تحميل البيانات:", error);
-            alert("حدث خطأ في الاتصال ببيانات Google Sheets");
+            console.error("خطأ في جلب البيانات:", error);
+            alert("فشل تحميل البيانات من Google Sheets");
         }
     }
 
-    // تصفية وتحديث الجدول
-    function updateTable() {
-        const selectedGrade = document.getElementById('gradeSelect').value;
-        const selectedDay = document.getElementById('daySelect').value;
-        const tableBody = document.getElementById('tableBody');
-        const noData = document.getElementById('noData');
+    function parseCSV(csvText) {
+        const lines = csvText.split('\n');
+        rawData = [];
+        // نفترض أن الترتيب: اليوم، الصف، المادة، المعلم، البدء، النهاية، الرابط
+        for (let i = 1; i < lines.length; i++) {
+            const cols = lines[i].split(',');
+            if (cols.length >= 7) {
+                rawData.push({
+                    day: cols[0].trim(),
+                    grade: cols[1].trim(),
+                    subject: cols[2].trim(),
+                    teacher: cols[3].trim(),
+                    start: cols[4].trim(),
+                    end: cols[5].trim(),
+                    link: cols[6].trim()
+                });
+            }
+        }
+        updateUI(); 
+    }
 
-        tableBody.innerHTML = "";
+    function handleLogin() {
+        const code = document.getElementById('passCode').value;
+        let role = '';
+        if (code === "1" || code === "١") role = 'student';
+        else if (code === "2261" || code === "٢٢٦١") role = 'teacher';
+
+        if (role) {
+            localStorage.setItem('user_role', role);
+            if (role === 'student') Notification.requestPermission();
+            startSystem();
+        } else {
+            alert("الرمز غير صحيح!");
+        }
+    }
+
+    async function startSystem() {
+        const role = localStorage.getItem('user_role');
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('mainApp').style.display = 'block';
         
-        const filtered = schoolData.filter(item => {
-            const gradeMatch = (selectedGrade === "الكل" || item.grade === selectedGrade);
-            const dayMatch = (item.day === selectedDay);
-            return gradeMatch && dayMatch;
-        });
+        if (role === 'teacher') {
+            document.getElementById('teacherPanel').style.display = 'block';
+            document.getElementById('appTitle').innerText = "لوحة التحكم 👨‍🏫";
+        } else {
+            document.getElementById('appTitle').innerText = "الجدول الدراسي";
+        }
+
+        // تحديد اليوم الحالي تلقائياً
+        const daysArr = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
+        const today = daysArr[new Date().getDay()];
+        if (["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس"].includes(today)) {
+            document.getElementById('daySelect').value = today;
+        }
+
+        await fetchSheetData(); // جلب البيانات أولاً
+        
+        setInterval(updateUI, 30000); 
+        if (role === 'student') scheduleNotifications();
+    }
+
+    function updateUI() {
+        const grid = document.getElementById('lessonsGrid');
+        if (!grid) return;
+        grid.innerHTML = '';
+        
+        const selectedDay = document.getElementById('daySelect').value;
+        const selectedGrade = document.getElementById('gradeSelect').value;
+        
+        const now = new Date();
+        const nowMins = now.getHours() * 60 + now.getMinutes();
+
+        const filtered = rawData.filter(item => item.day === selectedDay && item.grade === selectedGrade);
 
         if (filtered.length === 0) {
-            noData.style.display = "block";
+            grid.innerHTML = '<p style="text-align:center;">لا توجد حصص مجدولة لهذا الاختيار.</p>';
             return;
         }
 
-        noData.style.display = "none";
-        filtered.forEach(item => {
-            if(!item.subject) return; // تخطي السطور الفارغة
-            const row = `
-                <tr>
-                    <td><strong>${item.subject}</strong></td>
-                    <td>${item.teacher}</td>
-                    <td>${item.grade}</td>
-                    <td>${item.start}</td>
-                    <td>${item.end}</td>
-                    <td><a href="${item.link}" class="btn-link" target="_blank">دخول الحصة</a></td>
-                </tr>
+        filtered.forEach(lesson => {
+            const [sH, sM] = lesson.start.split(':').map(Number);
+            const [eH, eM] = lesson.end.split(':').map(Number);
+            const startTotal = sH * 60 + sM;
+            const endTotal = eH * 60 + eM;
+            const isActive = nowMins >= startTotal && nowMins < endTotal;
+
+            const card = document.createElement('div');
+            card.className = lesson-card ${isActive ? 'active-lesson' : ''};
+            
+            let progressHtml = '';
+            if (isActive) {
+                const pct = ((nowMins - startTotal) / (endTotal - startTotal)) * 100;
+                progressHtml = <div class="progress-container"><div class="progress-bar" style="width:${pct}%"></div></div>;
+            }
+
+            card.innerHTML = `
+                ${progressHtml}
+                <h3 style="margin:0">${lesson.subject}</h3>
+                <p style="color:gray; font-size:0.9rem;">👨‍🏫 ${lesson.teacher}</p>
+                <p>⏰ ${lesson.start} - ${lesson.end}</p>
+                <button class="btn btn-primary" onclick="joinSession('${lesson.subject}', '${lesson.link}')">🚀 دخول الحصة</button>
             `;
-            tableBody.innerHTML += row;
+            grid.appendChild(card);
         });
     }
 
-    // تشغيل الجلب عند فتح الصفحة
-    loadSheetData();
-</script>
+    function joinSession(subject, url) {
+        const role = localStorage.getItem('user_role');
+        if (role === 'student') {
+            let name = localStorage.getItem('student_name');
+            if (!name) {
+                name = prompt("سجل حضورك.. ادخل اسمك الثلاثي:");
+                if (name) localStorage.setItem('student_name', name);
+                else return;
+            }
+            const logs = JSON.parse(localStorage.getItem('attendance_logs') || '[]');
+            logs.push({ name, subject, time: new Date().toLocaleTimeString('ar-EG'), date: new Date().toLocaleDateString('ar-EG') });
+            localStorage.setItem('attendance_logs', JSON.stringify(logs));
+        }
+        window.open(url, '_blank');
+    }
 
+    function scheduleNotifications() {
+        rawData.forEach(lesson => {
+            const [h, m] = lesson.start.split(':').map(Number);
+            const alertTime = new Date();
+            alertTime.setHours(h, m - 1, 0); 
+            const diff = alertTime.getTime() - new Date().getTime();
+            if (diff > 0) {
+                setTimeout(() => {
+                    new Notification(🔔 اقترب موعد حصة ${lesson.subject}, { body: "ستبدأ الحصة بعد دقيقة، استعد!" });
+                }, diff);
+            }
+        });
+    }
+
+    function showAttendance() {
+        const display = document.getElementById('attendanceDisplay');
+        const logs = JSON.parse(localStorage.getItem('attendance_logs') || '[]');
+        display.style.display = 'block';
+        if (logs.length === 0) { display.innerHTML = "لا يوجد سجل حضور حالياً."; return; }
+        const grouped = logs.reduce((acc, obj) => {
+            acc[obj.subject] = acc[obj.subject] || [];
+            acc[obj.subject].push(• ${obj.name} (${obj.time}));
+            return acc;
+        }, {});
+        display.innerHTML = '<h4>قائمة الحضور المسجلة:</h4>';
+        for (const sub in grouped) {
+            display.innerHTML += <b>🔹 ${sub}:</b><br>${grouped[sub].join('<br>')}<br><br>;
+        }
+    }
+
+    function logout() { localStorage.clear(); location.reload(); }
+    
+    // التحقق عند فتح الصفحة
+    window.onload = () => {
+        if (localStorage.getItem('user_role')) startSystem();
+    };
+</script>
 </body>
 </html>
